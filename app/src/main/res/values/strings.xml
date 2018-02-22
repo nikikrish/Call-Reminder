@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Call Reminder</string>
+    <string name="Snooze_option_one">15 Mins</string>
+    <string name="Snooze_option_two">30 Mins</string>
+    <string name="Snooze_custom">Custom</string>
+    <string name="set_reminder_in">Set Reminder in</string>
+    <string name="lorem_ipsum">Lorem ipsum</string>
+    <string name="dummy_number">9876543210</string>
+    <string name="you_tried_calling">You tried calling</string>
+</resources>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.chauthai.swipereveallayout.SwipeRevealLayout
+    android:id="@+id/swipeLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    app:dragEdge="left"
+    app:mode="normal"
+    android:layout_height="85dp">
+
+
+    <RelativeLayout
+        android:id="@+id/view_bg"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="#fa315b"
+        android:gravity="center">
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/editIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            app:srcCompat="@drawable/ic_call_black_24dp" />
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/snoozeIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/editIcon"
+            app:srcCompat="@drawable/snooze" />
+
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/deleteIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/snoozeIcon"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            app:srcCompat="@drawable/delete" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/view_fg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fff"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/item_user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:text="Lorem ipsum"
+            android:fontFamily="@font/lato"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/item_user_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="9876543210"
+            android:fontFamily="@font/lato"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/item_last_call"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="Last called 0 Mins ago"
+            android:fontFamily="@font/lato"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</com.chauthai.swipereveallayout.SwipeRevealLayout>
