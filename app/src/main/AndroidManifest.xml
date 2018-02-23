@@ -3,7 +3,6 @@
     package="com.example.nikikrish.remdemo">
 
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
-    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
@@ -26,13 +25,13 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".AlarmReceiver">
-             </receiver>
+        <receiver android:name=".AlarmReceiver"/>
+
         <receiver android:name=".StateListener" >
             <intent-filter android:priority="1">
                 <action android:name="android.intent.action.PHONE_STATE"/>
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
-            </intent-filter>
+               <!-- <action android:name="android.intent.action.NEW_OUTGOING_CALL"/>
+            --></intent-filter>
 
         </receiver>
     </application>

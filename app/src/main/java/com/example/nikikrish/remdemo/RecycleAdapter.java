@@ -84,7 +84,7 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.MyViewHo
                             @Override
                             public void onTimeSet(TimePicker timePicker, int i, int i1) {
                                 dateTime = new DateTime().withHourOfDay(i).withMinuteOfHour(i1).withSecondOfMinute(0);
-                                details.duration = String.valueOf(dateTime.getMillis());
+                                details.setDuration( String.valueOf(dateTime.getMillis()));
                                 NotificationHelper.setNotification(AlarmReceiver.class,mContext,dateTime.getMillis());
                                 db.updateReminder(details);
                                 userDetailsList.clear();

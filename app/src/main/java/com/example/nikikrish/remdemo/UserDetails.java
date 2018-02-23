@@ -1,19 +1,15 @@
 package com.example.nikikrish.remdemo;
 
-/**
- * Created by Nikikrish on 22-Feb-18.
- */
 
 public class UserDetails {
 
-    int id;
-    String contactName;
-    String contactNumber;
-    String callTime;
-    String enabled;
-    String duration;
-    String reminderTime;
-    String profilePath;
+    private int id;
+    private String contactName;
+    private String contactNumber;
+    private String callTime;
+    private String enabled;
+    private String duration;
+    private String reminderTime;
 
     UserDetails(){};
     UserDetails(String name,String number,String callTime,String duration){
@@ -27,23 +23,23 @@ public class UserDetails {
         this.id = id;
     }
 
-    public void setContactName(String contactName) {
+    void setContactName(String contactName) {
         this.contactName = contactName;
     }
 
-    public void setContactNumber(String contactNumber) {
+    void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
     }
 
-    public void setCallTime(String callTime) {
+    void setCallTime(String callTime) {
         this.callTime = callTime;
     }
 
-    public void setEnabled(String enabled) {
+    void setEnabled(String enabled) {
         this.enabled = enabled;
     }
 
-    public void setDuration(String duration) {
+    void setDuration(String duration) {
         this.duration = duration;
     }
 
@@ -51,23 +47,19 @@ public class UserDetails {
         this.reminderTime = reminderTime;
     }
 
-    public void setProfilePath(String profilePath) {
-        this.profilePath = profilePath;
-    }
-
     public int getId() {
         return id;
     }
 
-    public String getContactName() {
+    String getContactName() {
         return contactName;
     }
 
-    public String getContactNumber() {
+    String getContactNumber() {
         return contactNumber;
     }
 
-    public String getCallTime() {
+     String getCallTime() {
         return callTime;
     }
 
@@ -83,7 +75,5 @@ public class UserDetails {
         return reminderTime;
     }
 
-    public String getProfilePath() {
-        return profilePath;
-    }
+
 }

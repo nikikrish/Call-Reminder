@@ -1,20 +1,16 @@
 package com.example.nikikrish.remdemo;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.PixelFormat;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -45,38 +41,18 @@ public class StateListener extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
         mContext = context;
-        if (intent != null && intent.getAction().equalsIgnoreCase(Intent.ACTION_NEW_OUTGOING_CALL)) {
-            Log.e("SL Phone", "Outgoing");
-        } else {
-            Log.i("SL Intent action type", intent.getAction() + " else");
-            Bundle b = intent.getExtras();
-            for (String key : b.keySet()) {
-                Log.e("SL Phone " + key, b.get(key) + "");
-            }
-            String[] tmp = getCallDetails(context,intent.getStringExtra("incoming_number"));
-            for(String s:tmp){
-                Log.i("SL Details ",s);
-            }
-            Bundle bundle = intent.getExtras();
+
+        Bundle bundle = intent.getExtras();
             final String number = bundle.getString("incoming_number");
             if((bundle.get("state").equals("IDLE"))){
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        /**
-                         *@params[0] is call duration
-                         *@params[1] is timestamp which represents the time of call
-                         ***/
-                        String params[];
-                        //read call logs for the outgoing number
-                        params = getCallDetails(mContext,number);
+                        String callLogDetails[];
+                        callLogDetails = getCallDetails(mContext,number);
                         //find the difference between current time and time at which call was made
-                        long difference = ((System.currentTimeMillis()/1000)-(Long.parseLong(params[1])/1000));
-                        Log.e("Diff",difference+" ");
-                        //if call duration is zero and the difference is greater than 2 second but less than a minute
-                        //display the prompt
-                        //maximum duration before the call gets disconnected automatically is 60 seconds
-                        if ((params[0].equals("0")) &&((difference>=2)&&(difference<65))){
+                        long difference = ((System.currentTimeMillis()/1000)-(Long.parseLong(callLogDetails[1])/1000));
+                        if (callLogDetails[0].equals("0")){
                             //display prompt for that number
                             displayPrompt(number);
                             }
@@ -85,14 +61,15 @@ public class StateListener extends BroadcastReceiver {
                 },1000);
 
             }
-        }
+
     }
 
-    private String[] getContactDetails(String number){
+    private String getContact(String number){
 
         //project only the name number and profile uri
-        String[] projection = new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                ContactsContract.CommonDataKinds.Phone.NUMBER};
+        String[] projection = new String[]{
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
+        String name ="";
 
         //return values that match the number
         Cursor cursor = mContext.getContentResolver().
@@ -105,16 +82,11 @@ public class StateListener extends BroadcastReceiver {
 
         if(cursor.getCount()>0){
 
-            //store values to an string array
-            String[] values =  new String[]{
-                    cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)),
-                    cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)),
-            };
+            name  = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             cursor.close();
-            return values;//return the string array
+            return name;
         }
-        //if no details found or contacts doesn't exits
-        return new String[]{"",number};
+        return name;
     }
 
 
@@ -159,7 +131,8 @@ public class StateListener extends BroadcastReceiver {
 
     private void displayPrompt(String number){
 
-        final String[] contactDetails = getContactDetails(number);
+        final String contactName = getContact(number);
+        final String contactNumber = number;
         final WindowManager windowManager = (WindowManager) mContext.getSystemService(WINDOW_SERVICE);
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                                         WindowManager.LayoutParams.MATCH_PARENT,
@@ -195,61 +168,26 @@ public class StateListener extends BroadcastReceiver {
         customBtn = view.findViewById(R.id.customButton);
         closeButton = view.findViewById(R.id.closeButton);
 
-        if(contactDetails[0].isEmpty()){
-            userName.setText(contactDetails[1]);
+        if(contactName.isEmpty()){
+            userName.setText(contactNumber);
             userPhoneNumber.setVisibility(View.INVISIBLE);
         }else{
-            userName.setText(contactDetails[0]);
-            userPhoneNumber.setText(contactDetails[1]);
+            userName.setText(contactName);
+            userPhoneNumber.setText(contactNumber);
         }
         fifteenBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dateTime = new DateTime().plusMinutes(15);
-                db = new DbHandler(mContext);
-                if(contactDetails[0].isEmpty()){
-                    db.addNewReminder(
-                            new UserDetails("unknown",
-                                    contactDetails[1],
-                                    String.valueOf(System.currentTimeMillis()),
-                                    String.valueOf(dateTime.getMillis())));
-
-                }else{
-                    db.addNewReminder(
-                            new UserDetails(contactDetails[0],
-                                    contactDetails[1],
-                                    String.valueOf(System.currentTimeMillis()),
-                                    String.valueOf(dateTime.getMillis())));
-
-                }
-                Toast.makeText(mContext,"Reminder Set for 15 Minutes",Toast.LENGTH_LONG).show();
-                NotificationHelper.setNotification(AlarmReceiver.class,mContext,dateTime.getMillis());
+                createNewReminder("Fifteen",dateTime.getMillis(),contactName,contactNumber);
                 windowManager.removeViewImmediate(ly);
-
             }
         });
         thirtyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dateTime = new DateTime().plusMinutes(30);
-                db = new DbHandler(mContext);
-                if(contactDetails[0].isEmpty()){
-                    db.addNewReminder(
-                            new UserDetails("unknown",
-                                    contactDetails[1],
-                                    String.valueOf(System.currentTimeMillis()),
-                                    String.valueOf(dateTime.getMillis())));
-
-                }else{
-                    db.addNewReminder(
-                            new UserDetails(contactDetails[0],
-                                    contactDetails[1],
-                                    String.valueOf(System.currentTimeMillis()),
-                                    String.valueOf(dateTime.getMillis())));
-
-                }
-                Toast.makeText(mContext,"Reminder Set for 30 Minutes",Toast.LENGTH_LONG).show();
-                NotificationHelper.setNotification(AlarmReceiver.class,mContext,dateTime.getMillis());
+                createNewReminder("Thirty",dateTime.getMillis(),contactName,contactNumber);
                 windowManager.removeViewImmediate(ly);
 
 
@@ -261,26 +199,9 @@ public class StateListener extends BroadcastReceiver {
                 TimePickerDialog pickerDialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                        db = new DbHandler(mContext);
                         //create a DateTime object for the time selected from the picker
                         dateTime = new DateTime().withHourOfDay(hour).withMinuteOfHour(minute).withSecondOfMinute(0);
-                        //set Reminder
-                        NotificationHelper.setNotification( AlarmReceiver.class,mContext, dateTime.getMillis());
-                        //add contactName,contactNumber,profilePicture path,Current Time,reminder time
-                        if(contactDetails[0].isEmpty()){
-                            db.addNewReminder(new UserDetails("unknown",
-                                    contactDetails[1],
-                                    String.valueOf(System.currentTimeMillis()),
-                                    String.valueOf(dateTime.getMillis())));
-                        }else{
-                            //add both name and number
-                            db.addNewReminder(new UserDetails(contactDetails[0],
-                                    contactDetails[1],
-                                    String.valueOf(System.currentTimeMillis()),
-                                    String.valueOf(dateTime.getMillis())));
-                        }
-                        String notifyTime = new DateTime().withMillis(dateTime.getMillis()).toString("HH:mm");
-                        Toast.makeText(mContext,"Notification Set for "+notifyTime,Toast.LENGTH_LONG).show();
+                       createNewReminder("Custom",dateTime.getMillis(),contactName,contactNumber);
                         windowManager.removeViewImmediate(ly);
                     }
                 },Calendar.getInstance().get(Calendar.HOUR_OF_DAY),
@@ -303,6 +224,29 @@ public class StateListener extends BroadcastReceiver {
         ly.addView(view);
 
         windowManager.addView(ly, params);
+
+    }
+
+    private void createNewReminder(String type,long time,String contactName,String contactNumber){
+        db = new DbHandler(mContext);
+        if(contactName.isEmpty()){
+            db.addNewReminder(
+                    new UserDetails("unknown",
+                            contactNumber,
+                            String.valueOf(System.currentTimeMillis()),
+                            String.valueOf(time)));
+
+        }else{
+            db.addNewReminder(
+                    new UserDetails(contactName,
+                            contactNumber,
+                            String.valueOf(System.currentTimeMillis()),
+                            String.valueOf(time)));
+
+        }
+
+        Toast.makeText(mContext,"Reminder Set for "+type+" Minutes",Toast.LENGTH_LONG).show();
+        NotificationHelper.setNotification(AlarmReceiver.class,mContext,dateTime.getMillis());
 
     }
 }
