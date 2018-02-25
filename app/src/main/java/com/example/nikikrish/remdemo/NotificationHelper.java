@@ -30,10 +30,11 @@ class NotificationHelper {
         intent.setAction("Reminder");
         intent.putExtra("reminderTime",time);
         pi = PendingIntent.getBroadcast(context, 4, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, pi);
 
-        SharedPreferences preferences = context.getSharedPreferences("CallBackPreference",0);
+        SharedPreferences preferences = context.getSharedPreferences("CallBackPreference",Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putLong("reminderTime",time);
         editor.apply();
@@ -51,9 +52,7 @@ class NotificationHelper {
         int REQUEST_CODE = 108;
 
         SharedPreferences preferences = context.getSharedPreferences("CallBackPreference",0);
-        for(String s: notificationDetails){
-            Log.e("Notify details",s);
-        }
+
         String title = String.format("Call %s back !!",notificationDetails[1]);
         String callTime = new DateTime().withMillis(Long.parseLong(notificationDetails[3])).toString("HH:mm");
         String content = String.format("You tried calling %s at %s ",notificationDetails[1],callTime);

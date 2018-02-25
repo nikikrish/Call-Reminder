@@ -37,8 +37,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //getCallDetails(context);
-        Log.i("Intent Received",intent.getAction()+" ");
+
         DbHandler db;
         String[] details;
         long reminderTime;
@@ -82,7 +81,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 db.close();
 
                 manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel(100);
+                manager.cancel(108);
                 break;
             case "DeleteNotification":
                 schedule = intent.getLongExtra("reminderTime",0);
@@ -95,7 +94,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 db.close();
 
                 manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel(100);
+                manager.cancel(108);
                 break;
             default:
                 Log.e("Intent",intent.getAction()+" AReceiver");

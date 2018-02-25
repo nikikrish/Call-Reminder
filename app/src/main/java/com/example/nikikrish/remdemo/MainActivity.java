@@ -1,6 +1,7 @@
 package com.example.nikikrish.remdemo;
 
 import android.Manifest;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     RecycleAdapter mAdapter;
+    CoordinatorLayout coordinatorLayout;
     List<UserDetails> details;
     DbHandler handler;
 
@@ -34,10 +36,9 @@ public class MainActivity extends AppCompatActivity {
         if(details.size()>0){
             setContentView(R.layout.activity_main);
 
-            // getCallDetails(getApplicationContext());
             recyclerView = findViewById(R.id.recyclerView);
-            handler = new DbHandler(getApplicationContext());
-            details = handler.getAllReminders();
+            coordinatorLayout= findViewById(R.id.coordinatorLayout);
+
             mAdapter = new RecycleAdapter(getApplicationContext(), details);
             RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
             recyclerView.setLayoutManager(mLayoutManager);
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
             setContentView(R.layout.empty_layout);
         }
 
-        Dexter.withActivity(this).withPermissions(Manifest.permission.ACCESS_COARSE_LOCATION,
+        Dexter.withActivity(this).withPermissions(
                 Manifest.permission.SYSTEM_ALERT_WINDOW,
                 Manifest.permission.PROCESS_OUTGOING_CALLS,
                 Manifest.permission.READ_CALL_LOG,

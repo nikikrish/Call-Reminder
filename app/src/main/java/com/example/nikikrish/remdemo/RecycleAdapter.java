@@ -7,8 +7,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,11 +62,14 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.MyViewHo
             holder.userName.setText(details.getContactName());
             holder.userNumber.setText(details.getContactNumber());
         }
-        if(Long.parseLong(details.getDuration())<System.currentTimeMillis()){
+
+        String lastCallTime = new DateTime().withMillis(Long.parseLong(details.getCallTime())).toString(" MMM dd ");
+        holder.lastCall.setText(lastCallTime+" Didn't Connect");
+        if(Long.parseLong(details.getDuration())<=System.currentTimeMillis()){
             holder.snoozeIcon.setVisibility(View.GONE);
+        }else{
+            holder.lastCall.append("\n Reminding at "+new DateTime().withMillis(Long.parseLong(details.getDuration())).toString(" MMM dd HH:mm "));
         }
-        String lastCallTime = new DateTime().withMillis(Long.parseLong(details.getCallTime())).toString("HH:mm");
-        holder.lastCall.setText("Last Called at "+lastCallTime);
         binderHelper.bind(holder.swipeRevealLayout,details.getCallTime());
         holder.editIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,9 +109,23 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.MyViewHo
         holder.deleteIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDeleteDialog(details,holder.getAdapterPosition());
-//                hasFutureActivityStarted = true;
-//                hasPastActivityStarted = false;
+                final DbHandler db = new DbHandler(mContext);
+                db.deleteReminder(details);
+                userDetailsList.remove(position);
+                notifyItemRemoved(position);
+                userDetailsList.clear();
+
+                Snackbar.make(holder.view_fg,"Reminder Deleted", Snackbar.LENGTH_LONG)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                db.addNewReminder(details);
+                                userDetailsList = db.getAllReminders();
+                                notifyDataSetChanged();
+                            }
+                        }).show();
+                userDetailsList = db.getAllReminders();
+                notifyDataSetChanged();
 
             }
         });
@@ -136,46 +155,5 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.MyViewHo
             snoozeIcon = itemView.findViewById(R.id.snoozeIcon);
             deleteIcon = itemView.findViewById(R.id.deleteIcon);
         }
-    }
-    public void removeItem(int position) {
-        userDetailsList.remove(position);
-        // notify the item removed by position
-        // to perform recycler view delete animations
-        // NOTE: don't call notifyDataSetChanged()
-        notifyItemRemoved(position);
-    }
-
-    public void restoreItem(UserDetails details, int position) {
-        userDetailsList.add(position, details);
-        // notify item added by position
-        notifyItemInserted(position);
-    }
-    private void showDeleteDialog(final UserDetails userDetails,final int position){
-        final AlertDialog.Builder builder= new AlertDialog.Builder(mContext.getApplicationContext());
-
-        builder.setTitle("Delete Reminder")
-                .setMessage("Are you sure ?")
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        DbHandler db = new DbHandler(mContext);
-                        db.deleteReminder(userDetails);
-                        userDetailsList.remove(position);
-                        notifyItemRemoved(position);
-                        userDetailsList.clear();
-                        userDetailsList = db.getAllReminders();
-                        notifyDataSetChanged();
-
-                    }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                builder.setCancelable(true);
-                dialogInterface.dismiss();
-            }
-        });
-        final AlertDialog dialog = builder.create();
-        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_PHONE);
-        dialog.show();
     }
 }

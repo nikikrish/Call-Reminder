@@ -73,7 +73,7 @@ public class DbHandler extends SQLiteOpenHelper {
         Cursor c = db.rawQuery(query,null);
         c.moveToFirst();
 
-        while(c.moveToNext())
+        do
         {
             if(c.getCount()>0){
                 UserDetails details = new UserDetails();
@@ -85,7 +85,8 @@ public class DbHandler extends SQLiteOpenHelper {
                 details.setEnabled(c.getColumnName(5));
                 userDetailsList.add(details);
             }
-        }c.close();
+        }while (c.moveToNext());
+        c.close();
         db.close();
         return  userDetailsList;
     }
@@ -126,12 +127,12 @@ public class DbHandler extends SQLiteOpenHelper {
                 null,
                 null);
         c.moveToFirst();
-        while (c.moveToNext()) {
+        do {
             if (c.getCount() > 0) {
                 Log.e("Cur Dump", DatabaseUtils.dumpCursorToString(c));
                 result = new String[]{c.getString(0), c.getString(1), c.getString(2), c.getString(3)};
             }
-        }
+        }while (c.moveToNext());
         c.close();
         return  result;
     }
